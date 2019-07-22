@@ -1,10 +1,42 @@
-                    BEAST v2.5.1 2018
-                 Beast 2 development team 2011-2018
+                    BEAST v2.6.0 2019
+                 Beast 2 development team 2011-2019
 Version History
-Last updated: September 2018
+Last updated: June 2019
 
 All issues can be viewed at https://github.com/CompEvol/beast2/issues
 ================================================================================
+Version 2.6.0
+	Robustify application launching and package upgrading (especially for Windows)
+	Make sequenceSimulator less sensitive to taxa ordering
+	Improved error messages
+	XML being produced is more standardised
+
+BEAUti
+	Make help menu extendible to add for example automatic methods section generator        
+	Saves last accessed directory between sessions
+	Default bounds on BSP pop sizes and random local clock rates updated
+	Let GuessPatternDialog handle empty fields.
+	Adding MRCAPriors more robust when multiple alignments share a tree
+	More complete Nexus parser
+
+For developers
+	More flexible options for constructing BEAST objects 
+	More access methods to core classes
+    	Added BEASTInterface::notClonable
+
+Version 2.5.2
+	More robust release for Windows that includes JRE
+	Fix AppLauncher for OS X
+	Robustify start scripts for OS X, Linux
+	Implement rate parameterisation for uncorrelated relaxed clock model
+	Improved error messages	
+	Relaxed API giving more access to package developers
+	Node.getMetaData() now returns null on key not found
+	Pass -Xss arguments through launchers to set stack size
+	DOIs point to preferred resolver
+	Fix multi-threading issue with parameteric distributions
+	Remove posterior ESS from screen log
+
 Version 2.5.1
 	Add -X flag to all applications, so more memory can be allocated
 	Fix some OS X with Java 9+ anomalies

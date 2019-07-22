@@ -96,17 +96,17 @@ public class Logger extends BEASTObject {
     /**
      * offset for the sample number, which is non-zero when a chain is resumed *
      */
-    static long sampleOffset = -1;
+    static protected long sampleOffset = -1;
 
     /**
      * number of samples between logs *
      */
-    long every = 1;
+    protected long every = 1;
 
     /**
      * stream to log to
      */
-    PrintStream m_out;
+    protected PrintStream m_out;
 
     /**
      * keep track of time taken between logs to estimate speed *
@@ -345,7 +345,7 @@ public class Logger extends BEASTObject {
 	}
 
 
-	boolean openLogFile() throws IOException {
+	protected boolean openLogFile() throws IOException {
         if (isLoggingToStdout()) {
             m_out = System.out;
             return true;
@@ -382,11 +382,13 @@ public class Logger extends BEASTObject {
                         	// we are using the BEAST console, so no input is possible
                         	throw new IllegalArgumentException();
 						}
-                        Log.info.println("Overwrite (Y/N)?:");
+                        Log.info.println("Overwrite (Y=yes/N=no/A=overwrite all)?:");
                         Log.info.flush();
                         final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));	                        
                         final String msg = stdin.readLine();
-                        if (!msg.toLowerCase().equals("y")) {
+                        if (msg.toLowerCase().equals("a")) {
+                        	FILE_MODE = LogFileMode.overwrite;
+                        } else if (!msg.toLowerCase().equals("y")) {
                         	Log.info.println("Exiting now.");
                             System.exit(0);
                         }
@@ -626,5 +628,16 @@ public class Logger extends BEASTObject {
     public static long getSampleOffset() {
         return sampleOffset < 0 ? 0 : sampleOffset;
     }
+    
+
+    public void setPrintStream(PrintStream m_out_alt){
+    	m_out = new PrintStream(m_out_alt);    	
+    }
+    
+    public PrintStream getPrintStream(){
+    	PrintStream m_out_alt = new PrintStream(m_out);
+    	return m_out_alt;
+    }
+
 
 } // class Logger

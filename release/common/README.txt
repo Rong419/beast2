@@ -1,7 +1,7 @@
-                    BEAST v2.5.1 2018
-                 Beast 2 development team 2011-2018
+                    BEAST v2.6.0 2019
+                 Beast 2 development team 2011-2019
 
-Last updated: September 2018
+Last updated: June 2019
 
 Contents:
 1) INTRODUCTION
@@ -187,7 +187,7 @@ ___________________________________________________________________________
 BEAST is an extremely complex program and as such will inevitably have
 bugs. Please email us to discuss any problems:
 
-<remco@cs.auckland.ac.nz>
+<r.bouckaert@auckland.ac.nz>
 <alexei@cs.auckland.ac.nz>
 <a.rambaut@ed.ac.uk>
 <msuchard@ucla.edu>

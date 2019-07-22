@@ -1,5 +1,6 @@
 <!-- Build BEAST 2. It is also used by Hudson BEAST_2 project. JUnit test is available for this build. -->
-<project basedir="." default="build_jar_all_BEAST" name="BUILD_BEAST_2">
+<project basedir="." default="build_jar_all_BEAST" name="BUILD_BEAST_2" 
+	xmlns:fx="javafx:com.sun.javafx.tools.ant">
     <description>
         Build BEAST 2.
         Also used by Hudson BEAST_2 project.
@@ -15,7 +16,7 @@
     <property name="dist" location="../beast2/build/dist" />
     <property name="test" location="../beast2/test" />
 
-    <property name="main_class_BEAST" value="beast.app.beastapp.BeastMain" />
+    <property name="main_class_BEASTLauncher" value="beast.app.beastapp.BeastLauncher" />
     <property name="report" value="build/junitreport" />
 
     <path id="classpath">
@@ -47,14 +48,14 @@
     <target name="build_all_BEAST" depends="clean,compile-all,junit" description="Clean and Build all run-time stuff">
     </target>
 
-    <!-- clean previous build, compile Java source code, and Junit test, and make the beast.jar and beauti.jar -->
+    <!-- clean previous build, compile Java source code, and Junit test, and make the beast.jar -->
     <target name="build_jar_all_BEAST"
             depends="clean,compile-all,junit,dist_all_BEAST"
             description="Clean and Build all run-time stuff">
     </target>
 
 
-    <!-- No JUnit Test, clean previous build, compile Java source code, and make the beast.jar and beauti.jar -->
+    <!-- No JUnit Test, clean previous build, compile Java source code, and make the beast.jar -->
     <target name="build_jar_all_BEAST_NoJUnitTest"
             depends="clean,compile-all,dist_all_BEAST"
             description="Clean and Build all run-time stuff">
@@ -89,6 +90,7 @@
         <delete file="${build}/beast/app/treeannotator/TreeAnnotatorLauncher.class" />
         <delete file="${build}/beast/app/util/Utils6.class" />
         <delete file="${build}/beast/app/BEASTVersion.class" />
+        <delete file="${build}/beast/util/BEASTClassLoader.class" />
         <delete>
 	      <fileset dir="${build}/beast/core/util/" includes="Log*.class" />
     	  <fileset dir="${build}/beast/app/beastapp/" includes="BeastLauncher*.class" />
@@ -113,6 +115,7 @@
             <include name="beast/util/Package*.java" />
             <include name="beast/app/util/Arguments.java" />
             <include name="beast/core/util/Log.java" />
+	    <include name="beast/util/BEASTClassLoader.java" />
         </javac>
         <copy todir="${build}">
             <fileset dir="${src}" includes="**/*.properties" />
@@ -130,7 +133,6 @@
         <jar jarfile="${dist}/beast.jar">
             <manifest>
                 <attribute name="Built-By" value="${user.name}" />
-                <attribute name="Main-Class" value="${main_class_BEAST}" />
             </manifest>
             <fileset dir="${build}">
                 <include name="beast/**/*.class" />
@@ -145,7 +147,12 @@
             <zipgroupfileset dir="${lib}" includes="commons-math3-3.1.1.jar" />
             <zipgroupfileset dir="${lib}" includes="antlr-runtime-4.7.jar"/>
         </jar>
+        
         <jar jarfile="${dist}/launcher.jar">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="${main_class_BEASTLauncher}" />
+            </manifest>
             <fileset dir="${build}">
                 <include name="beast/**/*Launcher*.class" />
                 <exclude name="beast/app/tools/AppLauncher.class"/>
@@ -155,10 +162,13 @@
                 <include name="beast/**/Version.class" />
 		    	<include name="beast/app/util/Arguments*.class" />
                 <include name="beast/util/Package*.class" />
+		<include name="beast/util/BEASTClassLoader.class" />
                 <include name="beast/app/draw/icons/beauti.png"/>
                 <include name="beast/core/util/Log*.class" />
-            </fileset>
+           </fileset>
         </jar>
+        
+
         <jar jarfile="${dist}/beast.src.jar">
             <fileset dir="${src}">
                 <include name="beast/**/*.java" />
@@ -256,10 +266,10 @@
 
 
     <!-- Release -->
-    <property name="version" value="2.5.1" />
-    <property name="version_number" value="2.5.1" />
+    <property name="version" value="2.6.0" />
+    <property name="version_number" value="2.6.0" />
     <property name="release_dir" value="release" />
-    <property name="copyright" value="Beast 2 development team 2011-2018" />
+    <property name="copyright" value="Beast 2 development team 2011-2019" />
 
     <property name="BEAST_name" value="BEAST" />
     <property name="beast_name" value="beast" />
@@ -312,7 +322,7 @@
         <copy todir="${Windows_package_dir}/bin">
             <fileset dir="${Windows_dir}/scripts"/>
         </copy>
-        <copy file="${dist}/beauti.jar" todir="${Windows_package_dir}/lib"/>-->
+        -->
         <copy file="${dist}/beast.jar" todir="${Windows_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Windows_package_dir}/lib" />
         <!-- <copy file="${dist}/beast-beagle.jar" todir="${Windows_package_dir}/lib"/>
@@ -437,7 +447,7 @@
             </fileset>
         </copy>
         <copy todir="${Windows_package_dir}/jre">
-            <fileset dir="../jre1.8.0_161" />
+            <fileset dir="../jdk8u212-b04-jre" />
         </copy>
         <!--<copy todir="${Windows_package_dir}/native">
             <fileset dir="${common_dir}/native"/>
@@ -448,7 +458,7 @@
         <copy todir="${Windows_package_dir}/bin">
             <fileset dir="${Windows_dir}/scripts"/>
         </copy>
-        <copy file="${dist}/beauti.jar" todir="${Windows_package_dir}/lib"/>-->
+        -->
         <copy file="${dist}/beast.jar" todir="${Windows_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Windows_package_dir}/lib" />
         <!-- <copy file="${dist}/beast-beagle.jar" todir="${Windows_package_dir}/lib"/>
@@ -542,13 +552,14 @@
                 <copy file="${beast1_dir}/LogCombiner.exe" todir="${Windows_package_dir}" />
                 <copy file="${beast1_dir}/TreeAnnotator.exe" todir="${Windows_package_dir}" />
         -->
-        <zip destfile="${Windows_dir}/${BEAST_name}.v${version}.zip">
+        <zip destfile="${Windows_dir}/${BEAST_name}_with_JRE.v${version}.zip">
             <zipfileset dir="${Windows_package_dir}" prefix="${BEAST_name}" />
         </zip>
-       <copy file="${Windows_dir}/${BEAST_name}.v${version}.zip" todir="../../tmp/" />
+       <copy file="${Windows_dir}/${BEAST_name}_with_JRE.v${version}.zip" todir="../../tmp/" />
 
         <echo message="Windows version release is finished." />
     </target>
+
 
     <target name="linux"
             depends="build_jar_all_BEAST_NoJUnitTest"
@@ -576,7 +587,7 @@
         <copy file="${common_dir}/icons/beast.png" todir="${Linux_package_dir}/images" />
         <copy file="${common_dir}/icons/beauti.png" todir="${Linux_package_dir}/images" />
         <!-- <copy file="${common_dir}/icons/utility.png" todir="${Linux_package_dir}/images" />
-        <copy file="${dist}/beauti.jar" todir="${Linux_package_dir}/lib" /> -->
+        -->
         <copy file="${dist}/launcher.jar" todir="${Linux_package_dir}/lib" />
         <copy file="${dist}/beast.jar" todir="${Linux_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Linux_package_dir}/lib" />
@@ -630,7 +641,7 @@
         </copy>
         <chmod dir="${Linux_package_dir}/bin" perm="755" includes="**/**" />
         <exec executable="cp">
-		<arg line="-R ../jre1.8.0_161 ${Linux_package_dir}/jre1.8.0_161"/>
+             <arg line="-R ../jdk8u212-b04-jre ${Linux_package_dir}/jre1.8.0_212"/>
 	</exec>
 
         <!--<copy todir="${Linux_package_dir}/doc">
@@ -647,7 +658,7 @@
         <copy file="${common_dir}/icons/beast.png" todir="${Linux_package_dir}/images" />
         <copy file="${common_dir}/icons/beauti.png" todir="${Linux_package_dir}/images" />
         <!-- <copy file="${common_dir}/icons/utility.png" todir="${Linux_package_dir}/images" />
-        <copy file="${dist}/beauti.jar" todir="${Linux_package_dir}/lib" /> -->
+        -->
         <copy file="${dist}/launcher.jar" todir="${Linux_package_dir}/lib" />
         <copy file="${dist}/beast.jar" todir="${Linux_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Linux_package_dir}/lib" />
@@ -722,7 +733,7 @@
             <fileset dir="${common_dir}/doc" />
         </copy>
 
-        <copy file="${dist}/beauti.jar" todir="${Mac_package_dir}/lib" /> -->
+		-->
         <copy file="${dist}/launcher.jar" todir="${Mac_package_dir}/lib" />
         <copy file="${dist}/beast.jar" todir="${Mac_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Mac_package_dir}/lib" />
@@ -750,7 +761,7 @@
             <runtime dir="/Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home"/>
             -->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -779,7 +790,7 @@
                    mainclassname="beast.app.beauti.BeautiLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Xdock:name=&quot;BEAUti&quot;"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
@@ -807,7 +818,7 @@
                    mainclassname="beast.app.tools.LogCombinerLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -833,7 +844,7 @@
                    mainclassname="beast.app.treeannotator.TreeAnnotatorLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -858,7 +869,7 @@
                    copyright="DensiTree, http://compevol.auckland.ac.nz/software/DensiTree/"
                    mainclassname="viz.DensiTree">
             <classpath file="${tools_dir}/DensiTree.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -883,7 +894,7 @@
                    mainclassname="beast.app.tools.AppLauncherLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx1024M"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -920,6 +931,8 @@
     </target>
 
 
+	<property environment="env"/>
+	
     <!-- Create the app bundle -->
     <target name="macjre">
         <delete dir="${Mac_package_dir}" />
@@ -941,7 +954,7 @@
             </fileset>
         </copy>
         <exec executable="cp">
-		    <arg line="-R ../jre1.8.0_161.jre/Contents/Home ${Mac_package_dir}/jre1.8.0_161"/>
+		    <arg line="-R ../jdk8u212-b04-jre/Contents/Home ${Mac_package_dir}/jre1.8.0_212"/>
 		</exec>
         <exec executable="gcc">
 		    <arg line="release/Mac/launch.c -o JavaAppLauncher"/>
@@ -950,7 +963,7 @@
             <fileset dir="${common_dir}/doc" />
         </copy>
 
-        <copy file="${dist}/beauti.jar" todir="${Mac_package_dir}/lib" /> -->
+		-->
         <copy file="${dist}/launcher.jar" todir="${Mac_package_dir}/lib" />
         <copy file="${dist}/beast.jar" todir="${Mac_package_dir}/lib" />
         <copy file="${dist}/beast.src.jar" todir="${Mac_package_dir}/lib" />
@@ -978,7 +991,7 @@
             <runtime dir="/Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home"/>
             -->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -1010,7 +1023,7 @@
                    mainclassname="beast.app.beauti.BeautiLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Xdock:name=&quot;BEAUti&quot;"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
@@ -1041,7 +1054,7 @@
                    mainclassname="beast.app.tools.LogCombinerLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -1070,7 +1083,7 @@
                    mainclassname="beast.app.treeannotator.TreeAnnotatorLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -1098,7 +1111,7 @@
                    copyright="DensiTree, http://compevol.auckland.ac.nz/software/DensiTree/"
                    mainclassname="viz.DensiTree">
             <classpath file="${tools_dir}/DensiTree.jar"/>
-            <option value="-Xmx4g"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -1126,7 +1139,7 @@
                    mainclassname="beast.app.tools.AppLauncherLauncher">
             <!--librarypath file="${dist}/beast.jar"/-->
             <classpath file="${Mac_package_dir}/lib/launcher.jar"/>
-            <option value="-Xmx1024M"/>
+            <option value="-Xmx8g"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
             <option value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
             <option value="-Duser.language=en"/>            
@@ -1161,6 +1174,213 @@
         
        <copy file="${Mac_dir}/${BEAST_name} v${version}.dmg" tofile="../../tmp/${BEAST_name}_with_JRE.v${version}.dmg" />
 
+
+        <echo message="Mac with JRE version release is finished." />
+    </target>
+
+
+
+	<target name="init-fx-tasks">
+		<echo message="java.home = ${java.home} "/>
+		<path id="fxant">
+			<filelist>
+				<file name="${java.home}/../lib/ant-javafx.jar"/>
+				<file name="${java.home}/../lib/jfxrt.jar"/> <!-- jdk9, jdk10 -->
+				<file name="${java.home}/../jre/lib/ext/jfxrt.jar"/> <!-- jdk8 -->
+			</filelist>
+		</path>
+	
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpathref="fxant"/>
+
+	</target>
+
+    <!-- Create the app bundle -->
+    <target name="macjre3" depends="init-fx-tasks">
+    
+
+        <delete dir="${Mac_package_dir}" />
+        <!--<delete file="${Mac_dir}/pack.temp.dmg"/>-->
+        <delete file="${Mac_dir}/BEAST v${version}.dmg"/>
+        <!-- Create the release directory -->
+        <mkdir dir="${Mac_package_dir}" />
+
+        <copy todir="${Mac_package_dir}/bin">
+            <fileset dir="${Linux_dir}/jrebin" />
+        </copy>
+        <chmod dir="${Mac_package_dir}/bin" perm="755" includes="**/**" />
+
+        <copy todir="${Mac_package_dir}/examples/">
+            <fileset dir="examples/">
+                <include name="*.xml" />
+                <include name="nexus/**" />
+                <exclude name="benchmark/**" />
+            </fileset>
+        </copy>
+
+        <copy file="${dist}/launcher.jar" todir="${Mac_package_dir}/lib" />
+        <copy file="${dist}/beast.jar" todir="${Mac_package_dir}/lib" />
+        <copy file="${dist}/beast.src.jar" todir="${Mac_package_dir}/lib" />
+        <!-- <copy file="${dist}/beast-beagle.jar" todir="${Mac_package_dir}/lib"/>
+        <copy todir="${Mac_package_dir}/lib">
+            <fileset dir="${Mac_dir}/lib" />
+        </copy> -->
+
+        <copy file="${common_dir}/VERSION HISTORY.txt" todir="${Mac_package_dir}" />
+        <copy file="${common_dir}/README.txt" todir="${Mac_package_dir}" />
+        <copy file="${common_dir}/LICENSE.txt" todir="${Mac_package_dir}" />
+        
+        
+		<!--
+		<fx:signjar destdir="/tmp" alias="${AppleSigner}" verbose="true" storePass="" keyPass="">
+			<fx:fileset dir='${dist}' includes='*.jar'/>
+		</fx:signjar>
+		-->
+		
+		<fx:resources id="appRes">
+			<fx:fileset dir="${dist}" includes="launcher.jar"/>
+			<fx:fileset dir="${dist}" includes="beast.jar"/>
+			<!--
+			<fx:fileset dir="${dist}" includes="beast.src.jar"/>
+  	        <fx:fileset dir="${common_dir}" includes="VERSION HISTORY.txt"/>
+    	    <fx:fileset dir="${common_dir}" includes="README.txt"/>
+        	<fx:fileset dir="${common_dir}" includes="LICENSE.txt"/>
+            <fx:fileset dir="./examples/" includes="*.xml" />
+            <fx:fileset dir="./examples/nexus" includes="**" />
+            <fx:fileset dir="./templates" includes="**" />
+            -->
+		</fx:resources> 
+		
+		<fx:application id="fxApplication"
+			name="${BEAST_name}"
+			mainClass="beast.app.beastapp.BeastMain"
+			toolkit="fx"
+		    version="${version}"
+		>
+            <fx:argument>-window</fx:argument>
+            <fx:argument>-working</fx:argument>
+            <fx:argument>-options</fx:argument>
+		</fx:application>
+	
+		<mkdir dir="${Mac_package_dir}/build/classes/META-INF" />
+		
+				<fx:deploy
+			embedJNLP="true"
+			extension="false"
+			width="1200" height="800" 
+			includeDT="false"
+			offlineAllowed="true"
+			outdir="${Mac_package_dir}"
+			outfile="${BEAUti_name}" 
+			nativeBundles="image"
+			updatemode="background" >
+	
+	    	<fx:info title="${BEAUti_name}" vendor="${appVendor}"
+            	copyright="${BEAUti_name}, ${copyright}" description="${BEAUti_name}">
+        		<fx:icon href="${common_dir}/icons/beauti.icns"/>   
+    		</fx:info>
+			<fx:application id="BEAUtiApplication"
+				name="${BEAUti_name}"
+				mainClass="beast.app.beauti.Beauti"
+				toolkit="fx"
+			    version="${version}"
+			>
+            	<fx:argument>-capture</fx:argument>
+			</fx:application>
+			<fx:resources id="appResBEAUti">
+				<fx:fileset dir="${dist}" includes="beauti.jar"/>
+			</fx:resources> 
+			<fx:platform>
+            	<fx:jvmarg value="-Xmx8g"/>
+	            <fx:jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+    	        <fx:jvmarg value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
+        	    <fx:jvmarg value="-Duser.language=en"/>            
+            	<fx:jvmarg value="-Dbeast.load.jars=true"/>
+			</fx:platform>
+
+
+
+<!--
+			<fx:secondaryLauncher name="BEAUti"
+			    mainClass="beast.app.beauti.Beauti"
+			    version="${version}"
+			    title="BEAUti"
+			    description="BEAUti"
+			    copyright="${copyright}"
+			    menu="true"
+     			shortcut="false"
+     		>
+     			<fx:argument>-capture</fx:argument>
+            	<fx:jvmarg value="-Xmx8g"/>
+	            <fx:jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+    	        <fx:jvmarg value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
+        	    <fx:jvmarg value="-Duser.language=en"/>            
+            	<fx:jvmarg value="-Dbeast.load.jars=true"/>
+			</fx:secondaryLauncher>
+-->			
+		</fx:deploy>
+		
+		<!-- Need to use ${basedir} because somehow the ant task is calculating the directory differently -->
+		<fx:deploy
+			embedJNLP="true"
+			extension="false"
+			width="1200" height="800" 
+			includeDT="false"
+			offlineAllowed="true"
+			outdir="${Mac_package_dir}"
+			outfile="${BEAST_name}" 
+			nativeBundles="image"
+			updatemode="background" >
+	
+	    	<fx:info title="${BEAST_name}" vendor="${appVendor}"
+            	copyright="${BEAST_name}, ${copyright}" description="${BEAST_name}">
+        		<fx:icon href="${common_dir}/icons/beast.icns"/>   
+    		</fx:info>
+			<fx:application refId="fxApplication"/>
+			<fx:resources id="appResBEAUST">
+				<fx:fileset dir="${dist}" includes="beast.jar"/>
+			</fx:resources> 
+			<fx:platform>
+            	<fx:jvmarg value="-Xmx8g"/>
+	            <fx:jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+    	        <fx:jvmarg value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
+        	    <fx:jvmarg value="-Duser.language=en"/>            
+            	<fx:jvmarg value="-Dbeast.load.jars=true"/>
+			</fx:platform>
+
+
+
+<!--
+			<fx:secondaryLauncher name="BEAUti"
+			    mainClass="beast.app.beauti.Beauti"
+			    version="${version}"
+			    title="BEAUti"
+			    description="BEAUti"
+			    copyright="${copyright}"
+			    menu="true"
+     			shortcut="false"
+     		>
+     			<fx:argument>-capture</fx:argument>
+            	<fx:jvmarg value="-Xmx8g"/>
+	            <fx:jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+    	        <fx:jvmarg value="-Djava.library.path=$JAVAROOT:/usr/local/lib"/>
+        	    <fx:jvmarg value="-Duser.language=en"/>            
+            	<fx:jvmarg value="-Dbeast.load.jars=true"/>
+			</fx:secondaryLauncher>
+-->			
+		</fx:deploy>
+
+
+
+        <echo message="Signing..." />
+
+        <exec executable="codesign">
+            <arg value="-s"/>
+            <arg value="${AppleSigner}"/>
+            <arg value="-v"/>
+            <arg value="${Mac_dir}/${BEAST_name}/BEAST-${version}.dmg"/>
+        </exec>
 
         <echo message="Mac with JRE version release is finished." />
     </target>
