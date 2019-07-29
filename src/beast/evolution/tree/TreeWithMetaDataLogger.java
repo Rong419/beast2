@@ -136,7 +136,14 @@ public class TreeWithMetaDataLogger extends BEASTObject implements Loggable {
 						RealParameter rp = (RealParameter) metadata;
 						appendDouble(buf, rp.getArrayValue(node.labelNr));
 					} else {
-						buf.append(metadata.getArrayValue(node.labelNr));
+                        //System.out.println("metadata="+metadata);
+					    //System.out.println("dimension="+metadata.getDimension());
+                        //System.out.println("node.labelNr="+node.labelNr+",value="+metadata.getArrayValue(node.labelNr));
+						if(node.labelNr == 146){
+                            buf.append(0.0);
+                        } else {
+                            buf.append(metadata.getArrayValue(node.labelNr));
+                        }
 					}
 		            	}
 		            } else {

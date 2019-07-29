@@ -75,14 +75,19 @@ public class Sum extends CalculationNode implements Function, Loggable {
                 }
             }
         } else {
-
-            for (Function v : functionInput.get()) {
-                for (int i = 0; i < v.getDimension(); i++) {
-                    sum += v.getArrayValue(i);
-                }
-            }
+            sum = sum();
         }
         needsRecompute = false;
+    }
+
+    private double sum() {
+        double sum = 0;
+        for (Function v : functionInput.get()) {
+            for (int i = 0; i < v.getDimension(); i++) {
+                sum += v.getArrayValue(i);
+            }
+        }
+        return sum;
     }
 
     @Override
@@ -119,17 +124,18 @@ public class Sum extends CalculationNode implements Function, Loggable {
      */
     @Override
     public void init(PrintStream out) {
-        out.print("sum(" + ((BEASTObject) functionInput.get().get(0)).getID() + ")\t");
+        String name = "sum";
+        if (ignoreZeroBranchLengths) {
+            name = "sumIgnoreZeroBranchs";
+        }
+        out.print(name + "(" + ((BEASTObject) functionInput.get().get(0)).getID() + ")\t");
     }
 
     @Override
     public void log(long sampleNr, PrintStream out) {
-        double sum = 0;
-        for (Function v : functionInput.get()) {
-	        for (int i = 0; i < v.getDimension(); i++) {
-	            sum += v.getArrayValue(i);
-	        }
-        }
+        needsRecompute = true;
+        compute();
+
         if (mode == Mode.integer_mode) {
             out.print((int) sum + "\t");
         } else {
