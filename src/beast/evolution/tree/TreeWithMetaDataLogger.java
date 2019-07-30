@@ -29,6 +29,7 @@ public class TreeWithMetaDataLogger extends BEASTObject implements Loggable {
     
     boolean someMetaDataNeedsLogging;
     boolean substitutions = false;
+    double ratesNr;
 
     private DecimalFormat df;
 
@@ -64,6 +65,7 @@ public class TreeWithMetaDataLogger extends BEASTObject implements Loggable {
     public void log(long sample, PrintStream out) {
         // make sure we get the current version of the inputs
         Tree tree = (Tree) treeInput.get().getCurrent();
+        ratesNr = tree.getNodeCount() - 1;
         List<Function> metadata = parameterInput.get();
         for (int i = 0; i < metadata.size(); i++) {
         	if (metadata.get(i) instanceof StateNode) {
@@ -136,10 +138,7 @@ public class TreeWithMetaDataLogger extends BEASTObject implements Loggable {
 						RealParameter rp = (RealParameter) metadata;
 						appendDouble(buf, rp.getArrayValue(node.labelNr));
 					} else {
-                        //System.out.println("metadata="+metadata);
-					    //System.out.println("dimension="+metadata.getDimension());
-                        //System.out.println("node.labelNr="+node.labelNr+",value="+metadata.getArrayValue(node.labelNr));
-						if(node.labelNr == 146){
+                        if(node.labelNr == ratesNr){
                             buf.append(0.0);
                         } else {
                             buf.append(metadata.getArrayValue(node.labelNr));
