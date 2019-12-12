@@ -1,5 +1,19 @@
 #NEXUS
 
+[!Data from:
+@article{shankarappa1999consistent,
+  title={Consistent viral evolutionary changes associated with the progression of human immunodeficiency virus type 1 infection},
+  author={Shankarappa, RAJ and Margolick, Joseph B and Gange, Stephen J and Rodrigo, Allen G and Upchurch, David and Farzadegan, Homayoon and Gupta, Phalguni and Rinaldo, Charles R and Learn, Gerald H and He, XI and others},
+  journal={Journal of virology},
+  volume={73},
+  number={12},
+  pages={10489--10502},
+  year={1999},
+  publisher={Am Soc Microbiol},
+  Bdsk-Url-1 = {https://jvi.asm.org/content/jvi/73/12/10489.full.pdf}
+}
+]
+
 Begin DATA;
 	Dimensions ntax=117 nchar=663;
 	Format datatype=NUCLEOTIDE gap=-;

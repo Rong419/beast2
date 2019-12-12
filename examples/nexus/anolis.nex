@@ -1,5 +1,19 @@
 #NEXUS 
 
+[!Data from:
+@article{jackman1999phylogenetic,
+  title={Phylogenetic relationships and tempo of early diversification in Anolis lizards},
+  author={Jackman, Todd R and Larson, Allan and De Queiroz, Kevin and Losos, Jonathan B},
+  journal={Systematic Biology},
+  volume={48},
+  number={2},
+  pages={254--285},
+  year={1999},
+  publisher={Society of Systematic Zoology},
+  Bdsk-Url-1 = {https://doi.org/10.1080/106351599260283}
+}
+]
+
 Begin data;
 	Dimensions ntax=29 nchar=1456;
 	Format datatype=dna gap=-;
