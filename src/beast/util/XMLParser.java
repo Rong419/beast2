@@ -25,55 +25,32 @@
 package beast.util;
 
 
-import static beast.util.XMLParserUtils.processPlates;
-import static beast.util.XMLParserUtils.replaceVariable;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.StringReader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import beast.app.beauti.PartitionContext;
-import beast.core.BEASTInterface;
-import beast.core.BEASTObjectStore;
-import beast.core.Distribution;
-import beast.core.Input;
-import beast.core.Input.Validate;
-import beast.core.Logger;
-import beast.core.Operator;
-import beast.core.Param;
+import beast.core.*;
 import beast.core.Runnable;
-import beast.core.State;
-import beast.core.VirtualBEASTObject;
+import beast.core.Input.Validate;
 import beast.core.parameter.Parameter;
 import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.alignment.Sequence;
 import beast.evolution.tree.Tree;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
+
+import static beast.util.XMLParserUtils.processPlates;
+import static beast.util.XMLParserUtils.replaceVariable;
 
 
 /**
@@ -202,6 +179,7 @@ public class XMLParser {
 
 
     static HashMap<String, String> element2ClassMap;
+    static HashMap<String, String> oldClass2ClassMap;
     static Set<String> reservedElements;
     static {
         element2ClassMap = new HashMap<>();
@@ -217,6 +195,30 @@ public class XMLParser {
         reservedElements = new HashSet<>();
         for (final String element : element2ClassMap.keySet()) {
         	reservedElements.add(element);
+        }
+        
+        // Parse version.xml files
+        // Encoded in version.xml as <map from="old.class.Name" to="new.class.Name"/>
+        // This helps with refactoring packages while keeping old XML parseable.
+        oldClass2ClassMap = new HashMap<>();
+        for (String dir : PackageManager.getBeastDirectories()) {
+        	File file = new File(dir + "/version.xml");
+        	if (file.exists()) {
+        		try {
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    Document doc = factory.newDocumentBuilder().parse(file);
+                    doc.normalize();
+                    NodeList nodes = doc.getElementsByTagName("map");
+                    for (int i = 0; i < nodes.getLength(); i++) {
+                        Element map = (Element) nodes.item(i);
+                        String fromClass = map.getAttribute("from");
+                        String toClass = map.getAttribute("to");
+                        oldClass2ClassMap.put(fromClass, toClass);
+                    }
+                } catch (ParserConfigurationException|SAXException|IOException e) {
+                    e.printStackTrace();
+                }        		
+        	}
         }
     }
 
@@ -762,6 +764,10 @@ public class XMLParser {
                     }
                 } catch (ClassNotFoundException e) {
                     // class does not exist -- try another namespace
+                	if (oldClass2ClassMap.containsKey(nameSpace + specClass)) {
+                		clazzName = oldClass2ClassMap.get(nameSpace + specClass);
+                		isDone = true;
+                	}
                 }
             }
 		}
@@ -830,7 +836,9 @@ public class XMLParser {
 		} catch (InstantiationException e) {
 			// we only get here when the class exists, but cannot be
 			// created for instance because it is abstract
-			throw new XMLParserException(node, "Cannot instantiate class. Please check the spec attribute.", 1006);
+            String msg = "Class " + clazzName + " exists but cannot to be instantiated.\n" +
+                    "Please check if the class has the zero-argument constructor.";
+			throw new XMLParserException(node, msg, 1006);
 		} catch (ClassNotFoundException e) {
 			// ignore -- class was found in beastObjectNames before
 		} catch (IllegalAccessException e) {
